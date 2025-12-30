@@ -32,26 +32,13 @@ const SseStreamHandler = {
 const MarkdownFormatter = {
     format(text) {
         if (!text) return "";
-        let html = text
-            .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-
-        // Headers (m flag for multi-line start matching)
-        html = html.replace(/^### (.*$)/gim, '<div class="memo-md-h3">$1</div>');
-        html = html.replace(/^## (.*$)/gim, '<div class="memo-md-h2">$1</div>');
-        html = html.replace(/^# (.*$)/gim, '<div class="memo-md-h1">$1</div>');
-
-        // Bold and Code
-        html = html.replace(/\*\*(.*?)\*\*/g, '<span class="memo-md-bold">$1</span>');
-        html = html.replace(/`(.*?)`/g, '<span class="memo-md-code">$1</span>');
-
-        // Lists
-        html = html.replace(/^[*-] (.*$)/gim, '<div class="memo-md-li">• $1</div>');
-
-        // Paragraphs and Newlines
-        html = html.replace(/\n\n/g, '<br><div style="margin-bottom:8px;"></div>');
-        html = html.replace(/\n/g, '<br>');
-
-        return html;
+        try {
+            // Using professional 'marked' library included in manifest
+            return marked.parse(text);
+        } catch (e) {
+            console.error("[MarkdownFormatter] Error:", e);
+            return text.replace(/\n/g, '<br>'); // Safe fallback
+        }
     }
 };
 
