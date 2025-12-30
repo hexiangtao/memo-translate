@@ -10,6 +10,34 @@
     --memo-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
+#memo-translate-icon {
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    background: var(--memo-primary);
+    color: white;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 2147483647;
+    display: none;
+    /* Controlled by JS */
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: bold;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+    user-select: none;
+    transition: transform 0.1s ease;
+}
+
+#memo-translate-icon:hover {
+    transform: scale(1.15);
+}
+
+#memo-translate-icon:active {
+    transform: scale(0.95);
+}
+
 #memo-translate-popup {
     position: absolute;
     width: 360px;
@@ -222,6 +250,37 @@
     border-radius: 4px;
     color: #be185d;
     font-family: monospace;
+}
+
+/* Markdown Header & List Styles */
+.memo-md-h1,
+.memo-md-h2,
+.memo-md-h3 {
+    font-weight: 700;
+    color: var(--memo-text);
+    margin: 12px 0 6px;
+    line-height: 1.3;
+}
+
+.memo-md-h1 {
+    font-size: 1.25em;
+    border-bottom: 2px solid var(--memo-border);
+    padding-bottom: 4px;
+}
+
+.memo-md-h2 {
+    font-size: 1.15em;
+}
+
+.memo-md-h3 {
+    font-size: 1.05em;
+    color: var(--memo-primary);
+}
+
+.memo-md-li {
+    margin: 6px 0 6px 4px;
+    line-height: 1.5;
+    display: block;
 }
 
 .memo-tag {
