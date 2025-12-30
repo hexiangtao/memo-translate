@@ -32,12 +32,26 @@ const SseStreamHandler = {
 const MarkdownFormatter = {
     format(text) {
         if (!text) return "";
-        return text
-            .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-            .replace(/\*\*(.*?)\*\*/g, '<span class="memo-md-bold">$1</span>')
-            .replace(/`(.*?)`/g, '<span class="memo-md-code">$1</span>')
-            .replace(/\n\n/g, '<br><div style="margin-bottom:8px;"></div>')
-            .replace(/\n/g, '<br>');
+        let html = text
+            .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+        // Headers (m flag for multi-line start matching)
+        html = html.replace(/^### (.*$)/gim, '<div class="memo-md-h3">$1</div>');
+        html = html.replace(/^## (.*$)/gim, '<div class="memo-md-h2">$1</div>');
+        html = html.replace(/^# (.*$)/gim, '<div class="memo-md-h1">$1</div>');
+
+        // Bold and Code
+        html = html.replace(/\*\*(.*?)\*\*/g, '<span class="memo-md-bold">$1</span>');
+        html = html.replace(/`(.*?)`/g, '<span class="memo-md-code">$1</span>');
+
+        // Lists
+        html = html.replace(/^[*-] (.*$)/gim, '<div class="memo-md-li">• $1</div>');
+
+        // Paragraphs and Newlines
+        html = html.replace(/\n\n/g, '<br><div style="margin-bottom:8px;"></div>');
+        html = html.replace(/\n/g, '<br>');
+
+        return html;
     }
 };
 
@@ -78,7 +92,8 @@ const initUI = () => {
     icon.addEventListener('mousedown', (e) => {
         e.preventDefault();
         e.stopPropagation();
-        const text = window.getSelection().toString().trim();
+        // Expert Robustness: Use fallback if selection is cleared by the click
+        const text = window.getSelection().toString().trim() || currentSelection;
         if (text) showTranslation(text);
     });
 
@@ -97,7 +112,8 @@ const handleMouseUp = (e) => {
         if (popup.style.display === 'block') return;
         const selection = window.getSelection();
         const text = selection.toString().trim();
-        if (text && text.length < 1000) {
+        // Support longer sentences with a more generous limit
+        if (text && text.length > 1 && text.length < 2000) {
             currentSelection = text;
             updateIconPosition(selection);
             icon.style.display = 'flex';
@@ -127,9 +143,19 @@ const handleClickOutside = (e) => {
 
 const updateIconPosition = (selection) => {
     if (selection.rangeCount === 0) return;
-    const rect = selection.getRangeAt(0).getBoundingClientRect();
-    icon.style.left = `${window.scrollX + rect.right + 5}px`;
-    icon.style.top = `${window.scrollY + rect.top}px`;
+    const range = selection.getRangeAt(0);
+    const rects = range.getClientRects();
+    if (rects.length === 0) return;
+
+    // Get the last rect for multi-line support
+    const lastRect = rects[rects.length - 1];
+
+    // Expert Positioning: Use pageX/YOffset for absolute positioning regardless of body relative state
+    const left = lastRect.right + window.pageXOffset;
+    const top = lastRect.bottom + window.pageYOffset;
+
+    icon.style.left = `${left + 5}px`;
+    icon.style.top = `${top - 10}px`;
 };
 
 async function showTranslation(text) {
