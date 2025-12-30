@@ -291,15 +291,15 @@ function renderInitialPopup(container, data, isSentence) {
             html += `</div>`;
         }
     }
-    html += `
+    const aiHtml = `
         <div class="memo-ai-analysis">
             <div class="memo-ai-content memo-ai-loading"><span class="memo-shimmer">AI 正在解析语法细节...</span></div>
         </div>
         <div class="memo-ai-chat-container">
             <div class="memo-section-title" style="color:var(--memo-text-light);">AI 助手</div>
             <div class="memo-chat-history"></div>
-        </div>
-    `;
+        </div>`;
+    html += aiHtml;
     container.innerHTML = html;
 }
 

@@ -4,25 +4,24 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonPropertyDescription
 
 data class AnalyzeRequest(
-    val text: String
+    val text: String = ""
 )
 
 data class ChatRequest(
-    val context: String,
-    val message: String
+    val context: String = "",
+    val message: String = ""
 )
 
 data class AnalyzeResponse(
     @JsonProperty("grammar")
     @JsonPropertyDescription("Detailed grammar analysis in Chinese")
-    val grammar: String,
+    val grammar: String = "",
     
     @JsonProperty("phrases")
     @JsonPropertyDescription("List of key phrases from the sentence")
-    val phrases: List<String>,
+    val phrases: List<String> = emptyList(),
     
     @JsonProperty("memoryTip")
     @JsonPropertyDescription("A creative mnemonic tip in Chinese")
-    val memoryTip: String
+    val memoryTip: String = ""
 )
-

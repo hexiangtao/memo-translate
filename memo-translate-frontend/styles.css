@@ -137,6 +137,39 @@
     user-select: none;
 }
 
+.memo-header-left {
+    display: flex;
+    align-items: center;
+}
+
+.memo-engine-selector {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    background: #f1f5f9;
+    border-radius: 10px;
+    font-size: 9px;
+    font-weight: 700;
+    color: #64748b;
+    cursor: pointer;
+    margin-left: 8px;
+    border: 1px solid #e2e8f0;
+    transition: all 0.2s;
+    user-select: none;
+    text-transform: uppercase;
+}
+
+.memo-engine-selector:hover {
+    background: #e2e8f0;
+    color: var(--memo-primary);
+}
+
+.memo-engine-selector.active {
+    background: #eef2ff;
+    color: var(--memo-primary);
+    border-color: #c7d2fe;
+}
+
 .memo-header-right {
     display: flex;
     align-items: center;

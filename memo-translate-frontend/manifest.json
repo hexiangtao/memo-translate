@@ -9,16 +9,24 @@
   ],
   "host_permissions": [
     "https://translate.googleapis.com/*",
-    "https://translate-pa.googleapis.com/*"
+    "https://translate-pa.googleapis.com/*",
+    "http://localhost:8080/*"
   ],
   "background": {
     "service_worker": "background.js"
   },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
-      "js": ["marked.min.js", "content.js"],
-      "css": ["styles.css"]
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "marked.min.js",
+        "content.js"
+      ],
+      "css": [
+        "styles.css"
+      ]
     }
   ],
   "action": {

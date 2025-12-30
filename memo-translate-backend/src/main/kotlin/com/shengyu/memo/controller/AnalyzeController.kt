@@ -23,4 +23,9 @@ class AnalyzeController(
     fun chat(@RequestBody request: ChatRequest): Flux<String> {
         return openAiService.chatStream(request.context, request.message)
     }
+
+    @PostMapping("/translate")
+    fun translate(@RequestBody request: AnalyzeRequest): reactor.core.publisher.Mono<com.shengyu.memo.dto.TranslationResponse> {
+        return openAiService.translate(request.text)
+    }
 }

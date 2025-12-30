@@ -45,6 +45,40 @@ class OpenAiService(
     }
 
     /**
+     * Fallback translation method (non-streaming).
+     */
+    fun translate(text: String): reactor.core.publisher.Mono<com.shengyu.memo.dto.TranslationResponse> {
+        val messages = listOf(
+            mapOf("role" to "system", "content" to Prompts.SYSTEM_TRANSLATOR),
+            mapOf("role" to "user", "content" to "Translate: \"$text\"")
+        )
+
+        val requestBody = mapOf(
+            "model" to properties.chat.options.model,
+            "messages" to messages,
+            "response_format" to mapOf("type" to "json_object"),
+            "temperature" to 0.3
+        )
+
+        return webClient.post()
+            .uri("/chat/completions")
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(requestBody)
+            .retrieve()
+            .bodyToMono(String::class.java)
+            .map { responseStr ->
+                // Basic JSON extraction from AI response
+                // In production, use a proper JSON parser (Jackson) to map the 'choices[0].message.content'
+                val root = com.fasterxml.jackson.databind.ObjectMapper().readTree(responseStr)
+                val content = root.path("choices").get(0).path("message").path("content").asText()
+                val result = com.fasterxml.jackson.databind.ObjectMapper().readValue(content, com.shengyu.memo.dto.TranslationResponse::class.java)
+                result.copy(original = text)
+            }
+            .doOnSubscribe { logger.info("Fallback Translation Started: ${text.take(30)}...") }
+            .doOnError { e -> logger.error("Fallback Translation Failed: ${e.message}") }
+    }
+
+    /**
      * Core orchestration method for streaming completions to avoid redundancy.
      */
     private fun streamChatCompletion(messages: List<Map<String, String>>, debugTag: String): Flux<String> {
@@ -86,6 +120,20 @@ class OpenAiService(
             (Provide a professional learning tip or mnemonic in one or two short paragraphs.)
             
             Always use double newlines between paragraphs for clear rendering.
+        """
+
+        const val SYSTEM_TRANSLATOR = """
+            You are a professional translator and lexicographer. 
+            Translate the given English text to Chinese.
+            Provide your response ONLY as a JSON object with this structure:
+            {
+              "translated": "Chinese translation",
+              "phonetic": "phonetic symbol or pinyin",
+              "dictionary": [{"pos": "noun", "terms": ["term1", "term2"]}],
+              "definitions": [{"pos": "noun", "defs": ["def1", "def2"]}],
+              "examples": ["example 1", "example 2"]
+            }
+            Ensure the JSON is valid and mirrors the depth of a professional dictionary.
         """
 
         fun systemChat(context: String) = """
