@@ -58,6 +58,8 @@ const MarkdownFormatter = {
 let icon = null;
 let popup = null;
 let currentSelection = "";
+let isMinimized = false;
+let isMaximized = false;
 
 const initUI = () => {
     if (document.getElementById('memo-translate-icon')) return;
@@ -73,8 +75,14 @@ const initUI = () => {
     popup.style.display = 'none';
     popup.innerHTML = `
         <div class="memo-header">
-            <span class="memo-title">Memo Translate</span>
-            <span class="memo-close">×</span>
+            <div class="memo-header-left">
+                <span class="memo-title">Memo Translate</span>
+            </div>
+            <div class="memo-header-right">
+                <div class="memo-header-btn memo-min-btn" title="最小化到小球">−</div>
+                <div class="memo-header-btn memo-max-btn" title="侧边栏模式">▢</div>
+                <div class="memo-header-btn memo-close" title="关闭">×</div>
+            </div>
         </div>
         <div class="memo-content"></div>
         <div class="memo-action-area" style="display:none;">
@@ -94,11 +102,33 @@ const initUI = () => {
         e.stopPropagation();
         // Expert Robustness: Use fallback if selection is cleared by the click
         const text = window.getSelection().toString().trim() || currentSelection;
-        if (text) showTranslation(text);
+        if (text) {
+            if (isMinimized) toggleMinimize();
+            showTranslation(text);
+        }
     });
 
-    popup.querySelector('.memo-close').addEventListener('click', () => {
+    popup.querySelector('.memo-min-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleMinimize();
+    });
+
+    popup.querySelector('.memo-max-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleMaximize();
+    });
+
+    popup.querySelector('.memo-close').addEventListener('click', (e) => {
+        e.stopPropagation();
         popup.style.display = 'none';
+        if (isMinimized) toggleMinimize();
+    });
+
+    popup.addEventListener('click', (e) => {
+        if (isMinimized) {
+            e.stopPropagation();
+            toggleMinimize();
+        }
     });
 
     document.addEventListener('mouseup', handleMouseUp);
@@ -137,7 +167,48 @@ const handleDblClick = (e) => {
 const handleClickOutside = (e) => {
     if (!icon.contains(e.target) && !popup.contains(e.target)) {
         icon.style.display = 'none';
-        popup.style.display = 'none';
+        // Only auto-hide if not maximized or minimized
+        if (!isMaximized && !isMinimized) {
+            popup.style.display = 'none';
+        }
+    }
+};
+
+const toggleMinimize = () => {
+    isMinimized = !isMinimized;
+    popup.classList.toggle('memo-minimized', isMinimized);
+
+    // Expert Visibility Fix: Ensure popup is in view when restoring from ball
+    if (!isMinimized && !isMaximized) {
+        // Trigger a reflow to get updated rect after class removal
+        const rect = popup.getBoundingClientRect();
+        const scrollY = window.pageYOffset;
+        const scrollX = window.pageXOffset;
+
+        // If the old position is off-screen (scrolled away), center it in view
+        if (rect.top < 0 || rect.top > window.innerHeight || rect.left < 0 || rect.left > window.innerWidth) {
+            popup.style.top = (scrollY + 80) + 'px';
+            popup.style.left = (scrollX + window.innerWidth - 400) + 'px';
+        }
+    }
+
+    if (isMinimized && isMaximized) {
+        isMaximized = false;
+        popup.classList.remove('memo-maximized');
+        const maxBtn = popup.querySelector('.memo-max-btn');
+        if (maxBtn) maxBtn.textContent = '▢';
+    }
+};
+
+const toggleMaximize = () => {
+    isMaximized = !isMaximized;
+    isMinimized = false;
+    popup.classList.remove('memo-minimized');
+    popup.classList.toggle('memo-maximized', isMaximized);
+    const maxBtn = popup.querySelector('.memo-max-btn');
+    if (maxBtn) {
+        maxBtn.textContent = isMaximized ? '❐' : '▢';
+        maxBtn.title = isMaximized ? '恢复浮动模式' : '侧边栏模式';
     }
 };
 
@@ -161,8 +232,11 @@ const updateIconPosition = (selection) => {
 async function showTranslation(text) {
     icon.style.display = 'none';
     popup.style.display = 'block';
-    popup.style.left = icon.style.left;
-    popup.style.top = icon.style.top;
+
+    if (!isMaximized && !isMinimized) {
+        popup.style.left = icon.style.left;
+        popup.style.top = icon.style.top;
+    }
 
     const contentDiv = popup.querySelector('.memo-content');
     contentDiv.innerHTML = '<div class="memo-loading"><span class="memo-shimmer">正在获取释义...</span></div>';
@@ -184,7 +258,7 @@ async function showTranslation(text) {
         renderInitialPopup(contentDiv, data, isSentence);
 
         const actionArea = popup.querySelector('.memo-action-area');
-        actionArea.style.display = 'block';
+        actionArea.style.display = 'flex';
         setupAIChat(popup, data.original);
 
         bindCommonActions(contentDiv, data, isSentence);
