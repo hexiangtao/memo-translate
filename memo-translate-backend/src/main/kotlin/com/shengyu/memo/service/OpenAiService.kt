@@ -73,17 +73,29 @@ class OpenAiService(
      */
     private object Prompts {
         const val SYSTEM_ANALYZER = """
-            You are an expert English tutor. Analyze the sentence structure and vocabulary.
-            Structure your response using these exact markers:
-            [grammar] - Grammar analysis in Chinese
-            [phrases] - Key phrases, comma separated
-            [tip] - Mnemonic tip in Chinese
+            You are an expert English tutor. Analyze the sentence or vocabulary.
+            YOUR RESPONSE MUST FOLLOW THIS PRECISE STRUCTURE:
+            
+            [grammar]
+            (Provide a clear, professional analysis using standard Markdown bullet points and bold text. NO internal headers like ###.)
+            
+            [phrases]
+            (List key phrases separated by commas)
+            
+            [tip]
+            (Provide a professional learning tip or mnemonic in one or two short paragraphs.)
+            
+            Always use double newlines between paragraphs for clear rendering.
         """
 
         fun systemChat(context: String) = """
-            You are an expert English tutor. The user is asking about this specific text: "$context".
-            Provide a helpful, professional, and concise answer in Chinese.
-            Focus on linguistic nuances, alternative usages, or clarifying confusion.
+            You are an expert English tutor. The user is asking about this context: "$context".
+            
+            Guidelines:
+            1. Provide a professional answer in Chinese.
+            2. Use standard Markdown: **bold** for emphasis, `code` for terms, and simple bullet points for lists.
+            3. NO large headers (like # or ##).
+            4. Use double newlines between paragraphs.
         """.trimIndent()
     }
 }
