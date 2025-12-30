@@ -1,0 +1,235 @@
+/* CSS for the injection UI */
+#memo-translate-icon {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    background: #4285f4;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    z-index: 2147483647;
+    /* Max z-index */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-family: sans-serif;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    user-select: none;
+}
+
+#memo-translate-popup {
+    position: absolute;
+    width: 300px;
+    background: white;
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    z-index: 2147483647;
+    border-radius: 8px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+}
+
+.memo-header {
+    background: #f1f3f4;
+    padding: 8px 12px;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.memo-title {
+    font-weight: bold;
+    color: #5f6368;
+}
+
+.memo-close {
+    cursor: pointer;
+    font-size: 18px;
+    color: #888;
+}
+
+.memo-close:hover {
+    color: #333;
+}
+
+.memo-content {
+    padding: 12px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.memo-result-header {
+    display: flex;
+    align-items: baseline;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+}
+
+.memo-result-word {
+    font-size: 18px;
+    font-weight: bold;
+    color: #202124;
+    margin-right: 8px;
+}
+
+.memo-play-audio {
+    cursor: pointer;
+    margin-right: 8px;
+    font-size: 16px;
+    user-select: none;
+    transition: transform 0.1s;
+}
+
+.memo-play-audio:active {
+    transform: scale(0.9);
+}
+
+.memo-result-phonetic {
+    font-size: 13px;
+    color: #5f6368;
+    font-family: 'Lucida Sans Unicode', 'Arial Unicode MS', sans-serif;
+}
+
+.memo-section {
+    margin-bottom: 12px;
+}
+
+.memo-section-title {
+    font-size: 12px;
+    font-weight: bold;
+    color: #1a73e8;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.memo-dict-item {
+    margin-bottom: 3px;
+    line-height: 1.4;
+    color: #333;
+}
+
+.memo-pos {
+    font-weight: bold;
+    color: #1a73e8;
+    font-style: italic;
+    margin-right: 4px;
+    font-size: 12px;
+}
+
+.memo-def-group {
+    margin-top: 4px;
+}
+
+.memo-def-item {
+    padding-left: 8px;
+    margin-bottom: 2px;
+    color: #444;
+    font-size: 13px;
+}
+
+.memo-examples {
+    font-style: italic;
+    color: #555;
+}
+
+.memo-ex-item {
+    margin-bottom: 2px;
+    padding-left: 8px;
+    font-size: 13px;
+}
+
+/* Highlight style for saved words on the page */
+.memo-highlight {
+    background-color: rgba(255, 235, 59, 0.4);
+    /* Light Yellow transparent */
+    border-bottom: 2px solid #fbc02d;
+    color: inherit;
+    border-radius: 2px;
+    cursor: help;
+    transition: background-color 0.2s;
+    position: relative;
+    /* For Pseudo-element positioning */
+}
+
+.memo-highlight:hover {
+    background-color: rgba(255, 235, 59, 0.7);
+}
+
+/* Inline Translation Annotation (Ruby-like) */
+.memo-highlight::after {
+    content: attr(data-trans);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: #fff;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s, bottom 0.2s;
+    z-index: 1000;
+    line-height: normal;
+}
+
+/* Show on hover */
+.memo-highlight:hover::after {
+    opacity: 1;
+    bottom: 110%;
+}
+
+/* Show ALL mode (triggered by body class) */
+body.memo-show-annotations .memo-highlight::after {
+    opacity: 1;
+    bottom: 110%;
+    /* Move up slightly */
+    background: #1a73e8;
+    /* Blue background to distinguish mode */
+}
+
+/* Sentence mode specific */
+.memo-result-sentence-trans {
+    font-size: 15px;
+    line-height: 1.4;
+    color: #202124;
+}
+
+.memo-footer {
+    padding: 8px 12px;
+    border-top: 1px solid #e0e0e0;
+    text-align: right;
+    background: #fff;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+#memo-save-btn {
+    background: #1a73e8;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+#memo-save-btn:hover {
+    background: #1557b0;
+}
+
+#memo-save-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}

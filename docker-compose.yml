@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  memo-backend:
+    build:
+      context: ./memo-translate-backend
+      dockerfile: Dockerfile
+    container_name: memo-translate-backend
+    ports:
+      - "8080:8080"
+    environment:
+      # 在这里配置你的 API Key 和模型
+      SPRING_AI_OPENAI_API_KEY: ${OPENAI_API_KEY:-sk-proj-your-key-here}
+      SPRING_AI_OPENAI_BASE_URL: ${OPENAI_BASE_URL:-https://api.openai.com}
+      SPRING_AI_OPENAI_CHAT_OPTIONS_MODEL: ${OPENAI_MODEL:-gpt-3.5-turbo}
+      SPRING_AI_OPENAI_CHAT_OPTIONS_TEMPERATURE: 0.7
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
