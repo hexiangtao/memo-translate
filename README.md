@@ -91,4 +91,4 @@ docker-compose up -d
 
 ## License
 
-随便用，改了记得告诉我一声。
+随便用。
